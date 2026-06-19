@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 text-secondary">
+            <i class="bi bi-box-seam"></i> Controle de Produtos
+        </h2>
+        <a href="{{ url_for('web.novo_produto_view') }}" class="btn btn-warning shadow-sm fw-semibold">
+            <i class="bi bi-plus-lg"></i> Inserir Produto
+        </a>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+
+            <table class="table table-hover table-striped mb-0 text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome do produto</th>
+                        <th>Preço Unitário</th>
+                        <th>Categoria Associada</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for produto in produtos %}
+
+                    <tr>
+                        <td class="fw-bold">{{ produto.id }}</td>
+                        <td>{{ produto.nome }}</td>
+                        <td>R$ {{ "%.2f"|format(produto.preco) }}</td>
+                        <td>
+                            <span class="badge bg-info text-dark fw-semibold">
+                                {{ produto.categoria.nome }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ url_for('web.editar_produto_view', id=produto.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form action="{{ url_for('web.excluir_produto_view', id=produto.id) }}" method="POST" onsubmit="return confirm('Deseja retirar {{ produto.nome }} do estoque?');" style="display: inline;">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="5" class="text-muted py-4">
+                            Estoque vazio. Adicione novos itens.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+
+{% endblock %}

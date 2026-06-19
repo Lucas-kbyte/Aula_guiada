@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="row justify-content-center"> 
+        <div class="col-md-6">
+            <div class="card shadow-border-0">
+                <div class="card-header bg-white py-3 texte-center">
+                    <h4 class="mb-0 text-secondary">
+                        {% if produto %}
+                            Modificar produto
+                        {% else %}
+                            Novo produto no Estoque
+                        {% endif %}
+                    </h4>
+                </div>
+
+                <div class="card-body py">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Nome do produto
+                            </label>
+                            <input type="text" name="nome" class="form-control" value="{{ produto.nome if produto else ''}}" required placeholder="Ex: Notebook M2">
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endlock %}
