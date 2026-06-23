@@ -7,3 +7,38 @@ def listar_todas_categorias():
 
 def obter_categoria(categoria_id):
     return Categoria.query.get_or_404(categoria_id)
+
+def salvar_categoria(nome, categoria_id=None):
+    if not nome or not nome.strip():
+        return False, "O nome da categoria é obrigatório."
+    
+    try:
+        if categoria_id:
+            categoria = obter_categoria(categoria_id)
+            categoria.nome = nome.strip()
+            mensagem = "Categoria atualizada com sucesso!"
+        else:
+            categoria = Categoria(nome=nome.strip())
+            db.session.add(categoria)
+            mensagem = "Categoria adicionada com sucesso!"
+        
+        db.session.commit()
+        return True, mensagem
+
+    except Exception as e:
+        db.session.rollback()
+        return False, f"Erro interno: {str(e)}"
+    
+def exlcuir_categoria(categoria_id):
+    categoria = obter_categoria(categoria_id)
+    
+    if categoria.produto:
+        return False, "Não é possível excluir a categoria, pois existem produtos associados a ela."
+    
+    try:
+        db.session.delete(categoria)
+        db.session.commit()
+        return True, "Categoria excluída com sucesso."
+    except Exception as e:
+        db.session.rollback()
+        return False, f"Erro ao excluir a categoria: {str(e)}"

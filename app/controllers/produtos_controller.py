@@ -42,3 +42,16 @@ def salvar_produto(nome, preco, categoria_id, produto_id):
     except Exception as e:
         db.session.rollback()
         return False, f"Erro interno: {str(e)}"
+    
+
+def excluir_produto(produto_id):
+    produto = obter_produto(produto_id)
+    
+    try:
+        db.session.delete(produto)
+        db.session.commit()
+        return True, "Produto excluído com sucesso! :3"
+    
+    except Exception as e:
+        db.session.rollback()
+        return False, f"Erro ao excluir o produto: {str(e)}"
