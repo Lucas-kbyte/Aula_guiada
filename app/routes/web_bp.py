@@ -1,5 +1,5 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from app.controllers import (produtos_controller, categoria_controller)
+from app.controllers import (produtos_controller, categoria_controller, usuarios_controller)
 
 web_bp = Blueprint("web", __name__)
 
@@ -7,6 +7,7 @@ web_bp = Blueprint("web", __name__)
 def index():
     return redirect(url_for("web.listar_produtos_view"))
 
+# Produtos
 
 @web_bp.route("/produtos")
 def listar_produtos_view():
@@ -98,3 +99,52 @@ def editar_categoria_view(id):
             return redirect(url_for('web.listar_categorias_view'))
         
     return render_template("categorias/form.html", categoria=categoria)
+
+# Usuarios
+
+@web_bp.route("/usuarios")
+def listar_usuarios_view():
+    usuarios = usuarios_controller.listar_todos_usuarios()
+    return render_template("usuarios/listar.html", usuarios=usuarios)
+
+@web_bp.route("/usuarios/novo", methods=["GET", "POST"])
+def novo_usuario_view():
+    if request.method == "POST":
+        nome = request.form.get("nome")
+        email = request.form.get("email")
+        senha = request.form.get("senha")
+        
+        sucesso, msg = usuarios_controller.salvar_usuario(nome,email,senha)
+        
+        flash(msg, "success" if sucesso else "danger")
+        
+        if sucesso:
+            return redirect(url_for("web.listar_usuarios_view"))
+        
+    return render_template("usuarios/form.html", usuarios=None)
+
+@web_bp.route("/usuarios/editar", methods=["GET", "POST"])
+def editar_usuario_view(id):
+    usuario = usuarios_controller.obter_usuario(id)
+    
+    if request.method == "POST":
+        nome = request.form.get("nome")
+        email = request.form.get("email")
+        senha = request.form.get("senha")
+        
+        sucesso, msg = usuarios_controller.salvar_usuario(nome, email, senha, usuarios_id=id)
+        
+        flash(msg, "success" if sucesso else "danger")
+        
+        if sucesso:
+            return redirect(url_for("web.listar_usuarios_view"))
+        
+    return render_template("usuarios/form.html", usuarios=usuario)
+
+@web_bp.route("/usuarios/excluir", methods=["POST"])
+def excluir_usuario_view(id):
+    sucesso, msg = usuarios_controller.excluir_usuario(id)
+    
+    flash(msg, "success" if sucesso else "danger")
+    
+    return redirect(url_for("web.listar_usuarios_view"))
