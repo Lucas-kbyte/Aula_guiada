@@ -8,6 +8,7 @@ def listar_todas_categorias():
 def obter_categoria(categoria_id):
     return Categoria.query.get_or_404(categoria_id)
 
+
 def salvar_categoria(nome, categoria_id=None):
     if not nome or not nome.strip():
         return False, "O nome da categoria é obrigatório."
@@ -29,16 +30,16 @@ def salvar_categoria(nome, categoria_id=None):
         db.session.rollback()
         return False, f"Erro interno: {str(e)}"
     
-def exlcuir_categoria(categoria_id):
+def excluir_categoria(categoria_id):
     categoria = obter_categoria(categoria_id)
-    
-    if categoria.produto:
-        return False, "Não é possível excluir a categoria, pois existem produtos associados a ela."
+
+    if categoria.produtos:
+        return False, "Não é possivel excluir uma categoria que possui produtos vinculados"
     
     try:
         db.session.delete(categoria)
         db.session.commit()
-        return True, "Categoria excluída com sucesso."
-    except Exception as e:
+        return True, "Categoria excluida com sucesso!"
+    except Exception as e :
         db.session.rollback()
-        return False, f"Erro ao excluir a categoria: {str(e)}"
+        return False, f"Erro ao excluir categoria: {str(e)}"

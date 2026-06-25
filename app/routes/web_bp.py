@@ -1,4 +1,5 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
+
 from app.controllers import (produtos_controller, categoria_controller, usuarios_controller)
 
 web_bp = Blueprint("web", __name__)
@@ -31,31 +32,33 @@ def novo_produto_view():
         
     return render_template("produtos/form.html", produto=None, categorias=categorias)
 
-
 @web_bp.route("/produtos/editar/<int:id>", methods=["GET", "POST"])
 def editar_produto_view(id):
     produto = produtos_controller.obter_produto(id)
     categorias = categoria_controller.listar_todas_categorias()
-    
+
     if request.method == "POST":
-        name = request.form.get("nome")
+        nome = request.form.get("nome")
         preco = float(request.form.get("preco", 0))
         categoria_id = int(request.form.get("categoria_id", 0))
-        
-        sucesso, msg = produtos_controller.salvar_produto(name, preco, categoria_id, produto_id=id)
-        
+
+        sucesso, msg = produtos_controller.salvar_produto(nome, preco, categoria_id, produto_id = id)
+
         flash(msg, "success" if sucesso else "danger")
+
         if sucesso:
             return redirect(url_for("web.listar_produtos_view"))
         
     return render_template("produtos/form.html", produto=produto, categorias=categorias)
+        
 
 
 @web_bp.route("/produtos/excluir/<int:id>", methods=["POST"])
 def excluir_produto_view(id):
-    sucessso, msg = produtos_controller.excluir_produto(id)
-    flash(msg, "success" if sucessso else "danger")
+    sucesso, msg = produtos_controller.excluir_produto(id)
+    flash(msg, "success" if sucesso else "danger")
     return redirect(url_for("web.listar_produtos_view"))
+
 
 # Categorias
 
@@ -71,6 +74,7 @@ def nova_categoria_view():
         nome = request.form.get("nome_categoria")
         
         sucesso, msg = categoria_controller.salvar_categoria(nome)
+
         flash(msg, "success" if sucesso else "danger")
 
         if sucesso:
@@ -78,27 +82,30 @@ def nova_categoria_view():
 
     return render_template("categorias/form.html", categoria=None)
 
+
 @web_bp.route("/categorias/excluir/<int:id>", methods=["POST"])
 def excluir_categoria_view(id):
     sucesso, msg = categoria_controller.excluir_categoria(id)
     flash(msg, "success" if sucesso else "danger")
-    return redirect(url_for('web.listar_categorias_view'))
+    return redirect(url_for("web.listar_categorias_view"))
 
-@web_bp.route("/categorias/editar/<int:id>", methods=["POST", "GET"])
+
+@web_bp.route("/categorias/editar/<int:id>", methods=["GET", "POST"])
 def editar_categoria_view(id):
     categoria = categoria_controller.obter_categoria(id)
-    
-    if request.form.get("nome_categoria"):
+
+    if request.method == "POST":
         nome = request.form.get("nome_categoria")
-        
+
         sucesso, msg = categoria_controller.salvar_categoria(nome, categoria_id=id)
-        
+
         flash(msg, "success" if sucesso else "danger")
 
         if sucesso:
-            return redirect(url_for('web.listar_categorias_view'))
-        
+            return redirect(url_for("web.listar_categorias_view"))
+    
     return render_template("categorias/form.html", categoria=categoria)
+
 
 # Usuarios
 
@@ -107,44 +114,46 @@ def listar_usuarios_view():
     usuarios = usuarios_controller.listar_todos_usuarios()
     return render_template("usuarios/listar.html", usuarios=usuarios)
 
+
 @web_bp.route("/usuarios/novo", methods=["GET", "POST"])
 def novo_usuario_view():
     if request.method == "POST":
         nome = request.form.get("nome")
         email = request.form.get("email")
         senha = request.form.get("senha")
-        
-        sucesso, msg = usuarios_controller.salvar_usuario(nome,email,senha)
-        
+
+        sucesso, msg = usuarios_controller.salvar_usuario(nome, email, senha)
+
         flash(msg, "success" if sucesso else "danger")
-        
+
         if sucesso:
             return redirect(url_for("web.listar_usuarios_view"))
-        
-    return render_template("usuarios/form.html", usuarios=None)
+    
+    return render_template("usuarios/form.html", usuario=None)
 
-@web_bp.route("/usuarios/editar", methods=["GET", "POST"])
+
+@web_bp.route("/usuarios/editar/<int:id>", methods=["GET", "POST"])
 def editar_usuario_view(id):
     usuario = usuarios_controller.obter_usuario(id)
-    
     if request.method == "POST":
         nome = request.form.get("nome")
         email = request.form.get("email")
         senha = request.form.get("senha")
-        
-        sucesso, msg = usuarios_controller.salvar_usuario(nome, email, senha, usuarios_id=id)
-        
+
+        sucesso, msg = usuarios_controller.salvar_usuario(nome, email, senha, usuario_id=id)
+
         flash(msg, "success" if sucesso else "danger")
-        
+
         if sucesso:
             return redirect(url_for("web.listar_usuarios_view"))
-        
-    return render_template("usuarios/form.html", usuarios=usuario)
+    
+    return render_template("usuarios/form.html", usuario=usuario)
 
-@web_bp.route("/usuarios/excluir", methods=["POST"])
+
+@web_bp.route("/usuarios/excluir/<int:id>", methods=["POST"])
 def excluir_usuario_view(id):
     sucesso, msg = usuarios_controller.excluir_usuario(id)
-    
+
     flash(msg, "success" if sucesso else "danger")
-    
+
     return redirect(url_for("web.listar_usuarios_view"))
